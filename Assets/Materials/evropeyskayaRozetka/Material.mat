@@ -100,8 +100,8 @@ Material:
     - _UVSec: 0
     - _ZWrite: 0
     m_Colors:
-    - _Color: {r: 0.151515, g: 1, b: 0, a: 0.21960784}
-    - _EmissionColor: {r: 0.1711892, g: 0.73204285, b: 0.120856114, a: 0}
+    - _Color: {r: 0, g: 0.8747977, b: 1, a: 0.21960784}
+    - _EmissionColor: {r: 0.06732824, g: 0.8396226, b: 0.46249822, a: 0}
     - _FresnelColor: {r: 1, g: 1, b: 1, a: 1}
     - _HighColor: {r: 1, g: 1, b: 1, a: 1}
     - _LowColor: {r: 1, g: 1, b: 1, a: 1}
