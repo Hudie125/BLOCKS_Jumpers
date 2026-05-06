@@ -4,6 +4,9 @@ using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
+    [Header("Physics")]
+    [SerializeField] private float checkRadius = 0.4f;
+    [SerializeField] private LayerMask obstacleLayer;
     [Header("Game objects")]
     [SerializeField] private Transform character;
 
@@ -71,11 +74,20 @@ public class GameManager : MonoBehaviour
 
             if(moveDirection != Vector2Int.zero){
                 Vector2Int destination = characterPos + moveDirection;
-                
-                if(inStartArea(destination)) {
+
+                Vector3 targetWorldPos = new Vector3(destination.x, 0.575f, destination.y);
+
+                bool isBlocked = Physics.CheckSphere(targetWorldPos, checkRadius, obstacleLayer);
+
+                if (!isBlocked && inStartArea(destination))
+                {
                     characterPos = destination;
                     StartCoroutine(MoveCharacter());
                 }
+                else {
+                    Debug.Log("Путь заблокирован!");
+                }
+                
             }
         }
     } 

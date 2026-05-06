@@ -2177,13 +2177,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.86282265, z: -0.50550675, w: 0}
+  m_LocalRotation: {x: 0, y: 0.83388585, z: -0.5519369, w: 0}
   m_LocalPosition: {x: 0, y: 8.1, z: 2.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 60.73, y: 180, z: 0}
+  m_LocalEulerAnglesHint: {x: 67, y: 180, z: 0}
 --- !u!1001 &969486470
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2268,7 +2268,7 @@ GameObject:
   - component: {fileID: 985750951}
   - component: {fileID: 985750953}
   - component: {fileID: 985750952}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Particle System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7817,6 +7817,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d99cfef4364ce6b4cbaeb356cfe34188, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  checkRadius: 0.4
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 64
   character: {fileID: 1384081851}
   moveDuration: 0.2
 --- !u!1001 &1364664363
@@ -9786,6 +9790,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1384081851}
     m_Modifications:
+    - target: {fileID: 1436920212677177627, guid: 518767c4ac3d8dd499f4bd3721897925, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6478581635496406842, guid: 518767c4ac3d8dd499f4bd3721897925, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6963659359816482028, guid: 518767c4ac3d8dd499f4bd3721897925, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7509506854805731311, guid: 518767c4ac3d8dd499f4bd3721897925, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 8318128080331390069, guid: 518767c4ac3d8dd499f4bd3721897925, type: 3}
       propertyPath: m_LocalScale.y
       value: 37.499996
@@ -9837,6 +9857,10 @@ PrefabInstance:
     - target: {fileID: 8657112306119534287, guid: 518767c4ac3d8dd499f4bd3721897925, type: 3}
       propertyPath: m_Name
       value: PlayerBlock
+      objectReference: {fileID: 0}
+    - target: {fileID: 8657112306119534287, guid: 518767c4ac3d8dd499f4bd3721897925, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
