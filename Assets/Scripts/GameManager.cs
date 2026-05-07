@@ -7,11 +7,16 @@ public class GameManager : MonoBehaviour
     [Header("Physics")]
     [SerializeField] private float checkRadius = 0.4f;
     [SerializeField] private LayerMask obstacleLayer;
+
     [Header("Game objects")]
     [SerializeField] private Transform character;
 
     [Header("Game parameters")]
     [SerializeField] private float moveDuration = 0.2f;
+
+    [SerializeField] private Animator animator;
+    [SerializeField] private AnimationCurve jumpCurve;
+    [SerializeField] private float jumpHeight = 0.5f;
 
     enum GameState {
         Ready,
@@ -30,6 +35,8 @@ public class GameManager : MonoBehaviour
         characterPos = new Vector2Int(0, -1);
         character.position = new Vector3(0, 0.575f, -1);
     }
+
+    // Z
 
     // Update
     void Update() {
@@ -96,6 +103,11 @@ public class GameManager : MonoBehaviour
     {
         gameState = GameState.Moving;
 
+        if (animator != null)
+        {
+            animator.SetTrigger("DoJump");
+        }
+
         float elapsedTime = 0f;
         float yHeight = 0.575f;
 
@@ -105,6 +117,8 @@ public class GameManager : MonoBehaviour
         while (elapsedTime < moveDuration) {
             float percent = elapsedTime / moveDuration;
             Vector3 newPos = Vector3.Lerp(startPos, endPos, percent);
+            float hill = jumpCurve.Evaluate(percent) * jumpHeight;
+            newPos.y += hill;
             character.position = newPos;
             elapsedTime += Time.deltaTime;
             yield return null;
