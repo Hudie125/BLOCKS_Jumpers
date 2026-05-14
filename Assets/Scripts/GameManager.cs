@@ -19,6 +19,14 @@ public class GameManager : MonoBehaviour
     private Vector2 touchStartPos;
     private Vector2 touchEndPos;
 
+    [Header("Camera Settings")]
+    [SerializeField] private Camera mainCamera;
+    [SerializeField] private Vector3 pcCameraOffset = new Vector3(0, 10, -10);
+    [SerializeField] private Vector3 mobileCameraOffset = new Vector3(0, 15, -15);
+    [SerializeField] private float mobileFieldOfView = 75f;
+    [SerializeField] private float pcFieldOfView = 60f;
+
+
     [SerializeField] private Animator animator;
     [SerializeField] private AnimationCurve jumpCurve;
     [SerializeField] private float jumpHeight = 0.5f;
@@ -33,12 +41,43 @@ public class GameManager : MonoBehaviour
 
     void Awake() {
         NewLevel();
+        AdjustCamera();
     }
 
     private void NewLevel() {
         gameState = GameState.Ready;
         characterPos = new Vector2Int(0, -1);
         character.position = new Vector3(0, 0.575f, -1);
+    }
+
+    private void AdjustCamera()
+    {
+        if (mainCamera == null) mainCamera = Camera.main;
+
+        bool isMobile = false;
+
+    #if UNITY_IOS || UNITY_ANDROID
+        isMobile = true;
+    #endif
+
+        if (Application.platform == RuntimePlatform.WebGLPlayer)
+        {
+            if ((float)Screen.width / Screen.height < 1.0f)
+            { 
+                isMobile = true;
+            }
+        }
+
+        if (isMobile)
+        {
+            mainCamera.transform.position = mobileCameraOffset;
+            mainCamera.fieldOfView = mobileFieldOfView;
+        }
+        else
+        { 
+            mainCamera.transform.position = pcCameraOffset;
+            mainCamera.fieldOfView = pcFieldOfView;
+        }
     }
 
     // Z

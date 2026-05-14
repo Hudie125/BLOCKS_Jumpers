@@ -2228,7 +2228,7 @@ Transform:
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.83388585, z: -0.5519369, w: 0}
-  m_LocalPosition: {x: 0, y: 6.7, z: 4}
+  m_LocalPosition: {x: 0, y: 10, z: 5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7888,6 +7888,12 @@ MonoBehaviour:
     m_Bits: 64
   character: {fileID: 1384081851}
   moveDuration: 0.2
+  minSwipeDistance: 50
+  mainCamera: {fileID: 963194227}
+  pcCameraOffset: {x: 0, y: 6.7, z: 4}
+  mobileCameraOffset: {x: 0, y: 10, z: 5}
+  mobileFieldOfView: 80
+  pcFieldOfView: 60
   animator: {fileID: 935779175}
   jumpCurve:
     serializedVersion: 2
