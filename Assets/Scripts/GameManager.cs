@@ -26,6 +26,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float mobileFieldOfView = 75f;
     [SerializeField] private float pcFieldOfView = 60f;
 
+    [Header("Score Settings")]
+    [SerializeField] private TMPro.TextMeshProUGUI scoreText;
+    private int score = 0;
+    private int maxZReached = 0;
 
     [SerializeField] private Animator animator;
     [SerializeField] private AnimationCurve jumpCurve;
@@ -56,14 +60,14 @@ public class GameManager : MonoBehaviour
 
         bool isMobile = false;
 
-    #if UNITY_IOS || UNITY_ANDROID
+#if UNITY_IOS || UNITY_ANDROID
         isMobile = true;
-    #endif
+#endif
 
         if (Application.platform == RuntimePlatform.WebGLPlayer)
         {
             if ((float)Screen.width / Screen.height < 1.0f)
-            { 
+            {
                 isMobile = true;
             }
         }
@@ -74,9 +78,27 @@ public class GameManager : MonoBehaviour
             mainCamera.fieldOfView = mobileFieldOfView;
         }
         else
-        { 
+        {
             mainCamera.transform.position = pcCameraOffset;
             mainCamera.fieldOfView = pcFieldOfView;
+        }
+    }
+
+    private void UpdateScore()
+    {
+        int currentProgress = Mathf.Abs(characterPos.y - (-1));
+
+        if (currentProgress > maxZReached)
+        {
+            score++; 
+            maxZReached = currentProgress; 
+
+            if (scoreText != null)
+            {
+                scoreText.text = score.ToString();
+            }
+
+            Debug.Log($"Прогресс: {currentProgress}, Счет: {score}");
         }
     }
 
@@ -129,6 +151,7 @@ public class GameManager : MonoBehaviour
                 if (!isBlocked && inStartArea(destination))
                 {
                     characterPos = destination;
+                    UpdateScore();
                     StartCoroutine(MoveCharacter());
                 }
                 else
