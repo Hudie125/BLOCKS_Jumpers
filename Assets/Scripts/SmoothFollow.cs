@@ -5,6 +5,7 @@ public class SmoothFollow : MonoBehaviour
     public Transform target;
     public float smoothTime = 0.3f;
     public Vector3 offset;
+    private float fixedY;
 
     private Vector3 velosity = Vector3.zero;
 
@@ -14,12 +15,15 @@ public class SmoothFollow : MonoBehaviour
         {
             offset = transform.position - target.position;
         }
+
+        fixedY = transform.position.y;
     }
     
     void LateUpdate()
     {
         if (target == null) return;
         Vector3 targetPosition = target.position + offset;
+        targetPosition.y = fixedY;
         transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velosity, smoothTime);
     }
 }

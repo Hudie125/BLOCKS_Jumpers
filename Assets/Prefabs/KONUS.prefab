@@ -60,9 +60,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8391222552659086748, guid: de12d7daf6247fc469f38474b43879d1, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: -7271449666460269675, guid: de12d7daf6247fc469f38474b43879d1, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: -5568371526223589888, guid: de12d7daf6247fc469f38474b43879d1, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: de12d7daf6247fc469f38474b43879d1, type: 3}
       propertyPath: m_Name
       value: KONUS
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: de12d7daf6247fc469f38474b43879d1, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 7202271454713460447, guid: de12d7daf6247fc469f38474b43879d1, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'

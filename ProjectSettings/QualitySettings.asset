@@ -4,7 +4,7 @@
 QualitySettings:
   m_ObjectHideFlags: 0
   serializedVersion: 5
-  m_CurrentQuality: 5
+  m_CurrentQuality: 2
   m_QualitySettings:
   - serializedVersion: 5
     name: Very Low
@@ -134,7 +134,7 @@ QualitySettings:
     realtimeReflectionProbes: 0
     billboardsFaceCameraPosition: 0
     useLegacyDetailDistribution: 1
-    adaptiveVsync: 0
+    adaptiveVsync: 1
     vSyncCount: 1
     realtimeGICPUUsage: 25
     adaptiveVsyncExtraA: 0
@@ -287,13 +287,13 @@ QualitySettings:
     globalTextureMipmapLimit: 0
     textureMipmapLimitSettings: []
     anisotropicTextures: 2
-    antiAliasing: 2
+    antiAliasing: 0
     softParticles: 1
     softVegetation: 1
     realtimeReflectionProbes: 1
     billboardsFaceCameraPosition: 1
     useLegacyDetailDistribution: 1
-    adaptiveVsync: 1
+    adaptiveVsync: 0
     vSyncCount: 1
     realtimeGICPUUsage: 100
     adaptiveVsyncExtraA: 0
@@ -310,7 +310,7 @@ QualitySettings:
     streamingMipmapsMaxFileIORequests: 1024
     particleRaycastBudget: 4096
     asyncUploadTimeSlice: 2
-    asyncUploadBufferSize: 16
+    asyncUploadBufferSize: 24
     asyncUploadPersistentBuffer: 1
     resolutionScalingFixedDPIFactor: 1
     customRenderPipeline: {fileID: 0}

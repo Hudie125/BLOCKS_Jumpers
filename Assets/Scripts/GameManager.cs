@@ -26,6 +26,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float mobileFieldOfView = 75f;
     [SerializeField] private float pcFieldOfView = 60f;
 
+    // –≠—Ç–∞–ª–æ–Ω–Ω—ã–µ —Å–æ–æ—Ç–Ω–æ—à–µ–Ω–∏—è —Å—Ç–æ—Ä–æ–Ω –¥–ª—è –∏–Ω—Ç–µ—Ä–ø–æ–ª—è—Ü–∏–∏ FOV
+    private float horizontalAspect = 16f / 9f; // ~1.77 (–®–∏—Ä–æ–∫–∏–π –º–æ–Ω–∏—Ç–æ—Ä)
+    private float verticalAspect = 9f / 16f;   // ~0.56 (–í–µ—Ä—Ç–∏–∫–∞–ª—å–Ω—ã–π —ç–∫—Ä–∞–Ω —Å–º–∞—Ä—Ç—Ñ–æ–Ω–∞)
+
+    private float lastWidth;
+    private float lastHeight;
+
     [Header("Score Settings")]
     [SerializeField] private TMPro.TextMeshProUGUI scoreText;
     private int score = 0;
@@ -46,6 +53,10 @@ public class GameManager : MonoBehaviour
     void Awake() {
         NewLevel();
         AdjustCamera();
+
+        // –ó–∞–ø–æ–º–∏–Ω–∞–µ–º —Å—Ç–∞—Ä—Ç–æ–≤–æ–µ —Ä–∞–∑—Ä–µ—à–µ–Ω–∏–µ —ç–∫—Ä–∞–Ω–∞
+        lastWidth = Screen.width;
+        lastHeight = Screen.height;
     }
 
     private void NewLevel() {
@@ -58,30 +69,15 @@ public class GameManager : MonoBehaviour
     {
         if (mainCamera == null) mainCamera = Camera.main;
 
-        bool isMobile = false;
+        // –†–∞—Å—Å—á–∏—Ç—ã–≤–∞–µ–º —Ç–µ–∫—É—â–µ–µ —Å–æ–æ—Ç–Ω–æ—à–µ–Ω–∏–µ —Å—Ç–æ—Ä–æ–Ω
+        float currentAspect = (float)Screen.width / Screen.height;
 
-#if UNITY_IOS || UNITY_ANDROID
-        isMobile = true;
-#endif
+        // –ù–∞—Ö–æ–¥–∏–º –∫–æ—ç—Ñ—Ñ–∏—Ü–∏–µ–Ω—Ç ¬´t¬ª –º–µ–∂–¥—É –≤–µ—Ä—Ç–∏–∫–∞–ª—å–Ω—ã–º –∏ –≥–æ—Ä–∏–∑–æ–Ω—Ç–∞–ª—å–Ω—ã–º —ç–∫—Ä–∞–Ω–æ–º (–æ—Ç 0.0 –¥–æ 1.0)
+        float t = Mathf.InverseLerp(verticalAspect, horizontalAspect, currentAspect);
 
-        if (Application.platform == RuntimePlatform.WebGLPlayer)
-        {
-            if ((float)Screen.width / Screen.height < 1.0f)
-            {
-                isMobile = true;
-            }
-        }
-
-        if (isMobile)
-        {
-            mainCamera.transform.position = mobileCameraOffset;
-            mainCamera.fieldOfView = mobileFieldOfView;
-        }
-        else
-        {
-            mainCamera.transform.position = pcCameraOffset;
-            mainCamera.fieldOfView = pcFieldOfView;
-        }
+        // –ü–ª–∞–≤–Ω–æ —Å–º–µ—à–∏–≤–∞–µ–º FOV –∏ –ø–æ–∑–∏—Ü–∏—é –∫–∞–º–µ—Ä—ã –Ω–∞ –æ—Å–Ω–æ–≤–µ –∫–æ—ç—Ñ—Ñ–∏—Ü–∏–µ–Ω—Ç–∞ t
+        mainCamera.fieldOfView = Mathf.Lerp(mobileFieldOfView, pcFieldOfView, t);
+        mainCamera.transform.position = Vector3.Lerp(mobileCameraOffset, pcCameraOffset, t);
     }
 
     private void UpdateScore()
@@ -95,23 +91,25 @@ public class GameManager : MonoBehaviour
 
             if (scoreText != null)
             {
-                scoreText.text = score.ToString();
+                scoreText.text = "Your score: " + score.ToString();
             }
-
-            Debug.Log($"œÓ„ÂÒÒ: {currentProgress}, —˜ÂÚ: {score}");
         }
     }
 
-    // Z
-
-    // Update
     void Update()
     {
+        // –ü—Ä–æ–≤–µ—Ä—è–µ–º, –∏–∑–º–µ–Ω–∏–ª—Å—è –ª–∏ —Ä–∞–∑–º–µ—Ä —ç–∫—Ä–∞–Ω–∞ (–¥–ª—è –ü–ö –≤ –æ–∫–Ω–µ –∏–ª–∏ –ø–æ–≤–æ—Ä–æ—Ç–∞ —Å–º–∞—Ä—Ç—Ñ–æ–Ω–∞)
+        if (Screen.width != lastWidth || Screen.height != lastHeight)
+        {
+            lastWidth = Screen.width;
+            lastHeight = Screen.height;
+            AdjustCamera();
+        }
+
         if (gameState == GameState.Ready)
         {
             Vector2Int moveDirection = Vector2Int.zero;
 
-            // --- ÀŒ√» ¿  À¿¬»¿“”–€ ---
             if (Keyboard.current.upArrowKey.wasPressedThisFrame || Keyboard.current.wKey.wasPressedThisFrame)
                 moveDirection = new Vector2Int(0, -1);
             else if (Keyboard.current.downArrowKey.wasPressedThisFrame || Keyboard.current.sKey.wasPressedThisFrame)
@@ -121,7 +119,7 @@ public class GameManager : MonoBehaviour
             else if (Keyboard.current.rightArrowKey.wasPressedThisFrame || Keyboard.current.dKey.wasPressedThisFrame)
                 moveDirection = new Vector2Int(-1, 0);
 
-            // --- ÀŒ√» ¿ —¬¿…œŒ¬ (Touch & Mouse) ---
+            // (Touch & Mouse) ---
             if (Pointer.current != null)
             {
                 if (Pointer.current.press.wasPressedThisFrame)
@@ -135,10 +133,8 @@ public class GameManager : MonoBehaviour
                 }
             }
 
-            // --- œ–»Ã≈Õ≈Õ»≈ ƒ¬»∆≈Õ»ﬂ ---
             if (moveDirection != Vector2Int.zero)
             {
-                // ”ÒÚ‡ÌÓ‚Í‡ ÓÚ‡ˆËË ÔÂÒÓÌ‡Ê‡ ‚ Á‡‚ËÒËÏÓÒÚË ÓÚ Ì‡Ô‡‚ÎÂÌËˇ
                 if (moveDirection.y == -1) character.localRotation = Quaternion.Euler(0, 180, 0);
                 else if (moveDirection.y == 1) character.localRotation = Quaternion.Euler(0, 0, 0);
                 else if (moveDirection.x == 1) character.localRotation = Quaternion.Euler(0, 90, 0);
@@ -153,10 +149,6 @@ public class GameManager : MonoBehaviour
                     characterPos = destination;
                     UpdateScore();
                     StartCoroutine(MoveCharacter());
-                }
-                else
-                {
-                    Debug.Log("œÛÚ¸ Á‡·ÎÓÍËÓ‚‡Ì!");
                 }
             }
         }
@@ -197,24 +189,19 @@ public class GameManager : MonoBehaviour
     {
         Vector2 delta = touchEndPos - touchStartPos;
 
-        // œÓ‚ÂÍ‡ Ì‡ ÏËÌËÏ‡Î¸ÌÛ˛ ‰ÎËÌÛ Ò‚‡ÈÔ‡
         if (delta.magnitude < minSwipeDistance) return Vector2Int.zero;
 
-        // »—œ–¿¬À≈ÕŒ: ƒÓ·‡‚ÎÂÌ ÁÌ‡Í '>' ‰Îˇ Ò‡‚ÌÂÌËˇ ‡·ÒÓÎ˛ÚÌ˚ı ÁÌ‡˜ÂÌËÈ
-        if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
-        {
-            // √ÓËÁÓÌÚ‡Î¸Ì˚È Ò‚‡ÈÔ
-            return delta.x < 0 ? new Vector2Int(1, 0) : new Vector2Int(-1, 0);
-        }
-        else
-        {
-            // ¬ÂÚËÍ‡Î¸Ì˚È Ò‚‡ÈÔ
-            return delta.y > 0 ? new Vector2Int(0, -1) : new Vector2Int(0, 1);
-        }
+            if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
+            {
+                return delta.x < 0 ? new Vector2Int(1, 0) : new Vector2Int(-1, 0);
+            }
+            else
+            {
+                return delta.y > 0 ? new Vector2Int(0, -1) : new Vector2Int(0, 1);
+            }
     }
 
     private bool inStartArea(Vector2Int pos) {
         return true; 
     }
-
-} 
+}

@@ -64,13 +64,29 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: -8391222552659086748, guid: cbb7748c63d0c0d4386f6510a6bab4dc, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: -7146521406498821007, guid: cbb7748c63d0c0d4386f6510a6bab4dc, type: 3}
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: -7146521406498821007, guid: cbb7748c63d0c0d4386f6510a6bab4dc, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: -4683669308469848369, guid: cbb7748c63d0c0d4386f6510a6bab4dc, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 8139693d8d53e8e4d97f8a0230f33ddb, type: 2}
     - target: {fileID: -2181743766629440291, guid: cbb7748c63d0c0d4386f6510a6bab4dc, type: 3}
       propertyPath: m_Layer
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: -2181743766629440291, guid: cbb7748c63d0c0d4386f6510a6bab4dc, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: cbb7748c63d0c0d4386f6510a6bab4dc, type: 3}
       propertyPath: m_Name
@@ -79,6 +95,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: cbb7748c63d0c0d4386f6510a6bab4dc, type: 3}
       propertyPath: m_Layer
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: cbb7748c63d0c0d4386f6510a6bab4dc, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
