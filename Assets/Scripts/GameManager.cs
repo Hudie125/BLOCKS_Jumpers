@@ -40,13 +40,15 @@ public class GameManager : MonoBehaviour
     private float lastWidth;
     private float lastHeight;
 
-    [Header("Score Settings")]
+    [Header("Score & Coin Settings")]
     [SerializeField] private TMPro.TextMeshProUGUI scoreText;
-    [SerializeField] private TMPro.TextMeshProUGUI bestScoreText; // Сюда перетащи текст для рекорда
+    [SerializeField] private TMPro.TextMeshProUGUI bestScoreText;
+    [SerializeField] private TMPro.TextMeshProUGUI coinsText; // Сюда перетащи текст для монет
 
     private int score = 0;
-    private int bestScore = 0; // Переменная под рекорд
+    private int bestScore = 0;
     private int maxZReached = 0;
+    private int totalCoins = 0; // Общий счетчик монет
 
     [SerializeField] private Animator animator;
     [SerializeField] private AnimationCurve jumpCurve;
@@ -76,10 +78,12 @@ public class GameManager : MonoBehaviour
             deathVignette.color = c;
         }
 
-        // ЗАГРУЗКА РЕКОРДА: Достаем сохраненный рекорд при старте игры
-        // Если игра запущена впервые, вернется 0
+        // Загружаем рекорд и монетки из памяти устройства
         bestScore = PlayerPrefs.GetInt("BestScore", 0);
+        totalCoins = PlayerPrefs.GetInt("TotalCoins", 0);
+
         UpdateBestScoreText();
+        UpdateCoinsText();
     }
 
     private void NewLevel()
@@ -87,6 +91,7 @@ public class GameManager : MonoBehaviour
         gameState = GameState.Ready;
         characterPos = new Vector2Int(0, -1);
         character.position = new Vector3(0, 0.575f, -1);
+        maxZReached = 0;
     }
 
     private void AdjustCamera()
@@ -100,33 +105,46 @@ public class GameManager : MonoBehaviour
 
     private void UpdateScore()
     {
-        int currentProgress = Mathf.Abs(characterPos.y - (-1));
+        int currentProgress = characterPos.y - (-1);
+
         if (currentProgress > maxZReached)
         {
             score++;
             maxZReached = currentProgress;
+
             if (scoreText != null) scoreText.text = "Your score: " + score.ToString();
 
-            // ПРОВЕРКА РЕКОРДА: Если текущий счет побил рекорд
             if (score > bestScore)
             {
                 bestScore = score;
                 UpdateBestScoreText();
-
-                // Сохраняем новое значение рекорда в память устройства
                 PlayerPrefs.SetInt("BestScore", bestScore);
-                PlayerPrefs.Save(); // Принудительно записываем на диск
+                PlayerPrefs.Save();
             }
         }
     }
 
-    // Метод для обновления текста рекорда на экране
+    // МЕТОД ДОБАВЛЕНИЯ МОНЕТЫ (Вызывается из скрипта Coin.cs)
+    public void AddCoin()
+    {
+        if (gameState == GameState.Dead) return;
+
+        totalCoins++;
+        UpdateCoinsText();
+
+        // Сохраняем новое количество монет в память устройства
+        PlayerPrefs.SetInt("TotalCoins", totalCoins);
+        PlayerPrefs.Save();
+    }
+
     private void UpdateBestScoreText()
     {
-        if (bestScoreText != null)
-        {
-            bestScoreText.text = "Best score: " + bestScore.ToString();
-        }
+        if (bestScoreText != null) bestScoreText.text = "Best score: " + bestScore.ToString();
+    }
+
+    private void UpdateCoinsText()
+    {
+        if (coinsText != null) coinsText.text = "Coins: " + totalCoins.ToString();
     }
 
     public void GameOver()
@@ -152,7 +170,6 @@ public class GameManager : MonoBehaviour
         if (deathVignette != null)
         {
             Color vignetteColor = deathVignette.color;
-
             while (elapsedTime < fadeDuration)
             {
                 elapsedTime += Time.deltaTime;
