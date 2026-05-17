@@ -10,27 +10,36 @@ public class CarMovement : MonoBehaviour
         speed = carSpeed;
         direction = carDirection;
 
-        // Поворачиваем модельки так, чтобы они смотрели вдоль дороги (по оси X)
+        // Настройка визуального разворота модели
         if (direction == 1)
         {
-            // Машина едет направо. 
-            // Поворачиваем её носом в сторону увеличения X.
-            transform.rotation = Quaternion.Euler(0, 90, 0); 
+            transform.rotation = Quaternion.Euler(0, 180, 0);
         }
         else
         {
-            // Машина едет налево.
-            // Поворачиваем её носом в сторону уменьшения X.
-            transform.rotation = Quaternion.Euler(0, -90, 0); 
+            transform.rotation = Quaternion.Euler(0, 0, 0);
         }
     }
 
     void Update()
     {
-        // ВМЕСТО Vector3.forward используем Vector3.right (ось X) или корректируем локальное движение.
-        // Если твоя моделька изначально (при нулевых поворотах) смотрит носом в бок, 
-        // то Translate(Vector3.forward) двигал её боком. 
-        // Теперь мы двигаем её вперед ПО ЕЁ СОБСТВЕННОМУ локальному направлению "вперед":
-        transform.Translate(Vector3.forward * speed * Time.deltaTime, Space.Self);
+        // Жесткое глобальное движение вдоль дороги (по оси X).
+        // Машина гарантированно смещается только влево/вправо, игнорируя кривые оси модели.
+        transform.Translate(Vector3.right * direction * speed * Time.deltaTime, Space.World);
+    }
+
+    // МЕТОД ДЛЯ ФИКСАЦИИ СТОЛКНОВЕНИЯ
+    private void OnTriggerEnter(Collider other)
+    {
+        // Проверяем, что объект, в который врезалась машина, имеет тег "Player"
+        if (other.CompareTag("Player"))
+        {
+            // Находим на сцене GameManager и вызываем метод завершения игры
+            GameManager gameManager = FindObjectOfType<GameManager>();
+            if (gameManager != null)
+            {
+                gameManager.GameOver();
+            }
+        }
     }
 }

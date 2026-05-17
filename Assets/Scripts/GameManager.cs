@@ -1,6 +1,8 @@
 using UnityEngine;
-using System.Collections; 
+using System.Collections;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -10,6 +12,12 @@ public class GameManager : MonoBehaviour
 
     [Header("Game objects")]
     [SerializeField] private Transform character;
+    [SerializeField] private GameObject characterVisual;
+    [SerializeField] private ParticleSystem deathParticles;
+
+    [Header("UI Effects")]
+    [SerializeField] private Image deathVignette;
+    [SerializeField] private float fadeDuration = 0.4f;
 
     [Header("Game parameters")]
     [SerializeField] private float moveDuration = 0.2f;
@@ -26,23 +34,26 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float mobileFieldOfView = 75f;
     [SerializeField] private float pcFieldOfView = 60f;
 
-    // Эталонные соотношения сторон для интерполяции FOV
-    private float horizontalAspect = 16f / 9f; // ~1.77 (Широкий монитор)
-    private float verticalAspect = 9f / 16f;   // ~0.56 (Вертикальный экран смартфона)
+    private float horizontalAspect = 16f / 9f;
+    private float verticalAspect = 9f / 16f;
 
     private float lastWidth;
     private float lastHeight;
 
     [Header("Score Settings")]
     [SerializeField] private TMPro.TextMeshProUGUI scoreText;
+    [SerializeField] private TMPro.TextMeshProUGUI bestScoreText; // Сюда перетащи текст для рекорда
+
     private int score = 0;
+    private int bestScore = 0; // Переменная под рекорд
     private int maxZReached = 0;
 
     [SerializeField] private Animator animator;
     [SerializeField] private AnimationCurve jumpCurve;
     [SerializeField] private float jumpHeight = 0.5f;
 
-    enum GameState {
+    enum GameState
+    {
         Ready,
         Moving,
         Dead
@@ -50,16 +61,29 @@ public class GameManager : MonoBehaviour
     private GameState gameState;
     private Vector2Int characterPos;
 
-    void Awake() {
+    void Awake()
+    {
         NewLevel();
         AdjustCamera();
 
-        // Запоминаем стартовое разрешение экрана
         lastWidth = Screen.width;
         lastHeight = Screen.height;
+
+        if (deathVignette != null)
+        {
+            Color c = deathVignette.color;
+            c.a = 0f;
+            deathVignette.color = c;
+        }
+
+        // ЗАГРУЗКА РЕКОРДА: Достаем сохраненный рекорд при старте игры
+        // Если игра запущена впервые, вернется 0
+        bestScore = PlayerPrefs.GetInt("BestScore", 0);
+        UpdateBestScoreText();
     }
 
-    private void NewLevel() {
+    private void NewLevel()
+    {
         gameState = GameState.Ready;
         characterPos = new Vector2Int(0, -1);
         character.position = new Vector3(0, 0.575f, -1);
@@ -68,14 +92,8 @@ public class GameManager : MonoBehaviour
     private void AdjustCamera()
     {
         if (mainCamera == null) mainCamera = Camera.main;
-
-        // Рассчитываем текущее соотношение сторон
         float currentAspect = (float)Screen.width / Screen.height;
-
-        // Находим коэффициент «t» между вертикальным и горизонтальным экраном (от 0.0 до 1.0)
         float t = Mathf.InverseLerp(verticalAspect, horizontalAspect, currentAspect);
-
-        // Плавно смешиваем FOV и позицию камеры на основе коэффициента t
         mainCamera.fieldOfView = Mathf.Lerp(mobileFieldOfView, pcFieldOfView, t);
         mainCamera.transform.position = Vector3.Lerp(mobileCameraOffset, pcCameraOffset, t);
     }
@@ -83,22 +101,76 @@ public class GameManager : MonoBehaviour
     private void UpdateScore()
     {
         int currentProgress = Mathf.Abs(characterPos.y - (-1));
-
         if (currentProgress > maxZReached)
         {
-            score++; 
-            maxZReached = currentProgress; 
+            score++;
+            maxZReached = currentProgress;
+            if (scoreText != null) scoreText.text = "Your score: " + score.ToString();
 
-            if (scoreText != null)
+            // ПРОВЕРКА РЕКОРДА: Если текущий счет побил рекорд
+            if (score > bestScore)
             {
-                scoreText.text = "Your score: " + score.ToString();
+                bestScore = score;
+                UpdateBestScoreText();
+
+                // Сохраняем новое значение рекорда в память устройства
+                PlayerPrefs.SetInt("BestScore", bestScore);
+                PlayerPrefs.Save(); // Принудительно записываем на диск
             }
         }
     }
 
+    // Метод для обновления текста рекорда на экране
+    private void UpdateBestScoreText()
+    {
+        if (bestScoreText != null)
+        {
+            bestScoreText.text = "Best score: " + bestScore.ToString();
+        }
+    }
+
+    public void GameOver()
+    {
+        if (gameState == GameState.Dead) return;
+        gameState = GameState.Dead;
+
+        if (characterVisual != null) characterVisual.SetActive(false);
+
+        if (deathParticles != null)
+        {
+            deathParticles.gameObject.SetActive(true);
+            deathParticles.Play();
+        }
+
+        StartCoroutine(RestartLevelCoroutine());
+    }
+
+    private IEnumerator RestartLevelCoroutine()
+    {
+        float elapsedTime = 0f;
+
+        if (deathVignette != null)
+        {
+            Color vignetteColor = deathVignette.color;
+
+            while (elapsedTime < fadeDuration)
+            {
+                elapsedTime += Time.deltaTime;
+                vignetteColor.a = Mathf.Clamp01(elapsedTime / fadeDuration);
+                deathVignette.color = vignetteColor;
+                yield return null;
+            }
+        }
+        else
+        {
+            yield return new WaitForSeconds(0.3f);
+        }
+
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
     void Update()
     {
-        // Проверяем, изменился ли размер экрана (для ПК в окне или поворота смартфона)
         if (Screen.width != lastWidth || Screen.height != lastHeight)
         {
             lastWidth = Screen.width;
@@ -119,13 +191,9 @@ public class GameManager : MonoBehaviour
             else if (Keyboard.current.rightArrowKey.wasPressedThisFrame || Keyboard.current.dKey.wasPressedThisFrame)
                 moveDirection = new Vector2Int(-1, 0);
 
-            // (Touch & Mouse) ---
             if (Pointer.current != null)
             {
-                if (Pointer.current.press.wasPressedThisFrame)
-                {
-                    touchStartPos = Pointer.current.position.ReadValue();
-                }
+                if (Pointer.current.press.wasPressedThisFrame) touchStartPos = Pointer.current.position.ReadValue();
                 if (Pointer.current.press.wasReleasedThisFrame)
                 {
                     touchEndPos = Pointer.current.position.ReadValue();
@@ -157,19 +225,17 @@ public class GameManager : MonoBehaviour
     private IEnumerator MoveCharacter()
     {
         gameState = GameState.Moving;
-
-        if (animator != null)
-        {
-            animator.SetTrigger("DoJump");
-        }
+        if (animator != null) animator.SetTrigger("DoJump");
 
         float elapsedTime = 0f;
         float yHeight = 0.575f;
-
         Vector3 startPos = character.position;
         Vector3 endPos = new Vector3(characterPos.x, yHeight, characterPos.y);
 
-        while (elapsedTime < moveDuration) {
+        while (elapsedTime < moveDuration)
+        {
+            if (gameState == GameState.Dead) yield break;
+
             float percent = elapsedTime / moveDuration;
             Vector3 newPos = Vector3.Lerp(startPos, endPos, percent);
             float hill = jumpCurve.Evaluate(percent) * jumpHeight;
@@ -178,9 +244,10 @@ public class GameManager : MonoBehaviour
             elapsedTime += Time.deltaTime;
             yield return null;
         }
-        character.position = endPos;
 
-        if (gameState == GameState.Moving) {
+        if (gameState != GameState.Dead)
+        {
+            character.position = endPos;
             gameState = GameState.Ready;
         }
     }
@@ -188,20 +255,10 @@ public class GameManager : MonoBehaviour
     private Vector2Int GetSwipeDirection()
     {
         Vector2 delta = touchEndPos - touchStartPos;
-
         if (delta.magnitude < minSwipeDistance) return Vector2Int.zero;
-
-            if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
-            {
-                return delta.x < 0 ? new Vector2Int(1, 0) : new Vector2Int(-1, 0);
-            }
-            else
-            {
-                return delta.y > 0 ? new Vector2Int(0, -1) : new Vector2Int(0, 1);
-            }
+        if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y)) return delta.x < 0 ? new Vector2Int(1, 0) : new Vector2Int(-1, 0);
+        else return delta.y > 0 ? new Vector2Int(0, -1) : new Vector2Int(0, 1);
     }
 
-    private bool inStartArea(Vector2Int pos) {
-        return true; 
-    }
+    private bool inStartArea(Vector2Int pos) { return true; }
 }
